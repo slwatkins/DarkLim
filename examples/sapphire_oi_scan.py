@@ -59,8 +59,8 @@ def process_mass(mass, args):
 
     SE = darklim.sensitivity.SensEst(args.target_mass_kg, args.t_days, tm=args.target, eff=1., gain=1., seed=(int(time.time() + mass*1e6)))
     SE.reset_sim()
-    SE.add_nfold_lee_bkgd(m=args.n_sensors, n=args.coincidence, w=args.window_s, e0=0.41e-3, R=33.)
-    SE.add_nfold_lee_bkgd(m=args.n_sensors, n=args.coincidence, w=args.window_s, e0=3.81e-3, R=0.023)
+    #SE.add_nfold_lee_bkgd(m=args.n_sensors, n=args.coincidence, w=args.window_s, e0=0.41e-3, R=33.)
+    #SE.add_nfold_lee_bkgd(m=args.n_sensors, n=args.coincidence, w=args.window_s, e0=3.81e-3, R=0.0226)
     SE.add_power_bkgd(1.4e-8, 5.77)
     SE.add_power_bkgd(0.107, 2.72)
 
@@ -103,11 +103,8 @@ def sapphire_scan():
     scanparser.write_info(args)
 
     # Main parallel execution block
-#    with mp.Pool(processes=min(args.max_cpus, mp.cpu_count())) as pool:
-#        results = pool.starmap(process_mass, [(mass, args) for mass in args.masses_GeV])
-    results = []
-    for i, mass in enumerate(args.masses_GeV):
-        results.append(process_mass(mass, args))
+    with mp.Pool(processes=min(args.max_cpus, mp.cpu_count())) as pool:
+        results = pool.starmap(process_mass, [(mass, args) for mass in args.masses_GeV])
 
     # save results to txt file
     sigma = np.zeros_like(args.masses_GeV)
